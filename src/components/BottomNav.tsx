@@ -5,10 +5,22 @@ const tabs = [
   { id: 'dashboard', label: 'DASH',   icon: GridIcon },
   { id: 'lighting',  label: 'LIGHT',  icon: BulbIcon },
   { id: 'energy',    label: 'ENERGY', icon: BoltIcon },
+  { id: 'settings',  label: 'SET',    icon: GearIcon },
 ]
 
+function GearIcon({ active }: { active: boolean }) {
+  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="3" stroke={c} strokeWidth="1.5" />
+      <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4"
+        stroke={c} strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 function HomeIcon({ active }: { active: boolean }) {
-  const c = active ? '#1A1A18' : '#ADADAA'
+  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <path d="M3 9 L10 3 L17 9 V17 H12 V12 H8 V17 H3 Z"
@@ -18,7 +30,7 @@ function HomeIcon({ active }: { active: boolean }) {
 }
 
 function GridIcon({ active }: { active: boolean }) {
-  const c = active ? '#1A1A18' : '#ADADAA'
+  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <rect x="2" y="2" width="7" height="7" stroke={c} strokeWidth="1.5" />
@@ -30,7 +42,7 @@ function GridIcon({ active }: { active: boolean }) {
 }
 
 function BulbIcon({ active }: { active: boolean }) {
-  const c = active ? '#1A1A18' : '#ADADAA'
+  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <path d="M10 3C7.24 3 5 5.24 5 8C5 9.98 6.1 11.7 7.75 12.6V15H12.25V12.6C13.9 11.7 15 9.98 15 8C15 5.24 12.76 3 10 3Z"
@@ -41,7 +53,7 @@ function BulbIcon({ active }: { active: boolean }) {
 }
 
 function BoltIcon({ active }: { active: boolean }) {
-  const c = active ? '#1A1A18' : '#ADADAA'
+  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <path d="M11 2L4 11H10L9 18L16 9H10L11 2Z"

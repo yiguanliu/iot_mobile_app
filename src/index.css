@@ -4,20 +4,65 @@
   padding: 0;
 }
 
+/* Nothing's NDot family. Files must be self-hosted under /public/fonts/.
+   If the files aren't present the browser falls through to Doto (closest free
+   dot-matrix analogue) and then Inter / Space Mono. font-display: swap means
+   no invisible-text flash while the file is loading or 404'ing. */
+@font-face {
+  font-family: 'Ndot 55';
+  src: url('/fonts/ndot-55.woff2') format('woff2'),
+       url('/fonts/ndot-55.otf')   format('opentype'),
+       url('/fonts/ndot-55.ttf')   format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ndot 55';
+  src: url('/fonts/ndot-55-bold.woff2') format('woff2'),
+       url('/fonts/ndot-55-bold.otf')   format('opentype'),
+       url('/fonts/ndot-55-bold.ttf')   format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Theme tokens are owned by ThemeProvider (src/state/theme.tsx).
+   This block is a Nothing-default fallback to prevent FOUC before React mounts. */
 :root {
-  --bg: #EEEEE8;
-  --bg-card: #F5F5F0;
-  --bg-card-dark: #E8E8E2;
-  --bg-dark: #1A1A18;
-  --text-primary: #1A1A18;
-  --text-secondary: #888880;
-  --text-muted: #ADADAA;
-  --accent: #E85D04;
-  --accent-alt: #2D6A4F;
-  --border: #D8D8D2;
-  --white: #FAFAFF;
+  --bg: #E5E5E5;
+  --bg-card: #FFFFFF;
+  --bg-card-dark: #F0F0F0;
+  --bg-dark: #000000;
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --accent: #E5232C;
+  --accent-alt: #000000;
+  --border: transparent;
+  --white: #FFFFFF;
+
   --font-mono: 'Space Mono', 'Courier New', monospace;
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Doto', 'Space Mono', monospace;
+
+  --radius-card: 20px;
+  --radius-pill: 999px;
+  --radius-tight: 12px;
+
+  --card-shadow: none;
+  --card-border: none;
+  --easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-slow: 700ms;
+  --duration-fast: 180ms;
+}
+
+/* Theme-specific decorative flourishes (Y2K = subtle inner highlight on cards) */
+body.theme-y2k {
+  /* gradient applied via JS so it survives React updates */
+}
+body.theme-y2k input[type="range"] {
+  accent-color: var(--accent);
 }
 
 /* sys63-style fixed shell — kills pull-to-refresh, rubber-band, double-tap zoom */
