@@ -5,19 +5,26 @@
 }
 
 :root {
-  --bg: #EEEEE8;
-  --bg-card: #F5F5F0;
-  --bg-card-dark: #E8E8E2;
-  --bg-dark: #1A1A18;
-  --text-primary: #1A1A18;
-  --text-secondary: #888880;
-  --text-muted: #ADADAA;
-  --accent: #E85D04;
-  --accent-alt: #2D6A4F;
-  --border: #D8D8D2;
-  --white: #FAFAFF;
+  /* Nothing-inspired palette: cool gray canvas, pure white cards, hard black, Nothing red */
+  --bg: #E5E5E5;
+  --bg-card: #FFFFFF;
+  --bg-card-dark: #F0F0F0;
+  --bg-dark: #000000;
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --accent: #E5232C;
+  --accent-alt: #000000;
+  --border: transparent;
+  --white: #FFFFFF;
+
+  /* Space Mono is the workhorse mono (legible at 10px); Doto reserved for big numerals via --font-display */
   --font-mono: 'Space Mono', 'Courier New', monospace;
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Doto', 'Space Mono', monospace;
+
+  --radius-card: 20px;
+  --radius-pill: 999px;
 }
 
 /* sys63-style fixed shell — kills pull-to-refresh, rubber-band, double-tap zoom */

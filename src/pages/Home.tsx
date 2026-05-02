@@ -177,7 +177,7 @@ function SceneStrip({ active, onPick }: SceneStripProps) {
             style={{
               flex: '0 0 auto',
               padding: '10px 16px',
-              borderRadius: 20,
+              borderRadius: 'var(--radius-pill)',
               background: isActive ? 'var(--text-primary)' : 'var(--bg-card)',
               color: isActive ? 'var(--bg)' : 'var(--text-primary)',
               border: `1px solid ${isActive ? 'var(--text-primary)' : 'var(--border)'}`,
@@ -210,7 +210,7 @@ function ZoneDetail({ zoneId, onClose }: { zoneId: string; onClose: () => void }
       style={{
         background: 'var(--bg-card)',
         border: '1px solid var(--border)',
-        borderRadius: 12,
+        borderRadius: 'var(--radius-card)',
         padding: 16,
         display: 'flex', flexDirection: 'column', gap: 12,
       }}
@@ -353,7 +353,7 @@ export default function Home() {
         layout
         style={{
           background: 'var(--bg-card)',
-          borderRadius: 12,
+          borderRadius: 'var(--radius-card)',
           border: '1px solid var(--border)',
           padding: 12,
           aspectRatio: '400 / 360',
