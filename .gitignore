@@ -51,5 +51,10 @@ coverage/
 # TypeScript
 *.tsbuildinfo
 
+# Self-hosted proprietary fonts (do not commit unless you have distribution rights)
+public/fonts/*.woff2
+public/fonts/*.otf
+public/fonts/*.ttf
+
 # Claude Code (keep launch.json + project settings, ignore local overrides)
 .claude/settings.local.json

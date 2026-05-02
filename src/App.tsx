@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Lighting from './pages/Lighting'
 import Energy from './pages/Energy'
+import Settings from './pages/Settings'
 import { useMediaQuery } from './hooks/useMediaQuery'
 
 const pageVariants = {
@@ -19,6 +20,7 @@ function renderPage(id: string): JSX.Element {
     case 'dashboard': return <Dashboard />
     case 'lighting':  return <Lighting />
     case 'energy':    return <Energy />
+    case 'settings':  return <Settings />
     default:          return <Home />
   }
 }
