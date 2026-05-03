@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { THEME_LIST, useTheme, Theme } from '../state/theme'
+import { RotateCcw } from 'lucide-react'
+import { THEME_LIST, useTheme, Theme, type ThemeVarKey } from '../state/theme'
 import CircularDimmer from '../components/CircularDimmer'
+import { Button } from '../components/ui/button'
+import { Slider } from '../components/ui/slider'
 
 // ─── Theme picker card ────────────────────────────────────────────────────────
 
@@ -308,20 +311,112 @@ function NavTilePreview({ icon, label, active }: { icon: string; label: string; 
   )
 }
 
+// ─── Color customization row ──────────────────────────────────────────────────
+
+interface ColorRowProps {
+  varKey: ThemeVarKey
+  label: string
+  description?: string
+}
+
+function ColorRow({ varKey, label, description }: ColorRowProps) {
+  const { getVar, setVar, clearVar, isOverridden } = useTheme()
+  const value = getVar(varKey)
+  const overridden = isOverridden(varKey)
+
+  // Native color inputs only accept hex; if the resolved var isn't a hex
+  // (e.g. 'transparent', rgba(...), gradient), fall back to a sensible default
+  // that the user can edit from.
+  const hexValue = /^#[0-9a-f]{6}$/i.test(value) ? value : '#000000'
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12,
+      padding: '12px 14px',
+      background: 'var(--bg-card)',
+      borderRadius: 'var(--radius-tight, 12px)',
+      border: 'var(--card-border, none)',
+    }}>
+      <label style={{ position: 'relative', flexShrink: 0, cursor: 'pointer' }}>
+        <input
+          type="color"
+          value={hexValue}
+          onChange={e => setVar(varKey, e.target.value)}
+          style={{
+            position: 'absolute', inset: 0, opacity: 0,
+            width: '100%', height: '100%', cursor: 'pointer',
+          }}
+        />
+        <div style={{
+          width: 40, height: 40, borderRadius: 'var(--radius-tight, 10px)',
+          background: value,
+          border: '1px solid rgba(0,0,0,0.12)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4)',
+        }} />
+      </label>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700,
+          color: 'var(--text-primary)', letterSpacing: '0.06em',
+        }}>
+          {label}
+        </div>
+        <div style={{
+          fontFamily: 'var(--font-mono)', fontSize: 10,
+          color: 'var(--text-muted)', marginTop: 2,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {value} {overridden && <span style={{ color: 'var(--accent)' }}>· custom</span>}
+        </div>
+        {description && (
+          <div style={{
+            fontFamily: 'var(--font-sans)', fontSize: 11,
+            color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.4,
+          }}>
+            {description}
+          </div>
+        )}
+      </div>
+
+      {overridden && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileTap={{ scale: 0.92 }}
+          onClick={() => clearVar(varKey)}
+          aria-label={`Reset ${label}`}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 32, height: 32, borderRadius: 'var(--radius-pill)',
+            background: 'var(--bg-card-dark)',
+            color: 'var(--text-secondary)',
+            cursor: 'pointer', flexShrink: 0,
+          }}
+        >
+          <RotateCcw size={14} strokeWidth={2} />
+        </motion.button>
+      )}
+    </div>
+  )
+}
+
 // ─── Library list ─────────────────────────────────────────────────────────────
 
 const COMPONENTS = [
-  { id: 'buttons',    label: 'Pill Buttons' },
-  { id: 'scenes',     label: 'Scene Chips' },
-  { id: 'toggle',     label: 'On/Off Toggle' },
-  { id: 'slider',     label: 'Slider' },
-  { id: 'card',       label: 'Card Surface' },
-  { id: 'metric',     label: 'Metric Card' },
-  { id: 'status',     label: 'Status Dot' },
-  { id: 'halo',       label: 'Sensor Halo' },
-  { id: 'zone',       label: 'Floorplan Zone' },
-  { id: 'dimmer',     label: 'Circular Dimmer' },
-  { id: 'nav',        label: 'Nav Tile' },
+  { id: 'buttons',        label: 'Pill Buttons' },
+  { id: 'shadcn-button',  label: 'shadcn Button' },
+  { id: 'shadcn-slider',  label: 'shadcn Slider' },
+  { id: 'scenes',         label: 'Scene Chips' },
+  { id: 'toggle',         label: 'On/Off Toggle' },
+  { id: 'slider',         label: 'Slider' },
+  { id: 'card',           label: 'Card Surface' },
+  { id: 'metric',         label: 'Metric Card' },
+  { id: 'status',         label: 'Status Dot' },
+  { id: 'halo',           label: 'Sensor Halo' },
+  { id: 'zone',           label: 'Floorplan Zone' },
+  { id: 'dimmer',         label: 'Circular Dimmer' },
+  { id: 'nav',            label: 'Nav Tile' },
 ] as const
 
 type ComponentId = typeof COMPONENTS[number]['id']
@@ -339,6 +434,41 @@ function LibraryDemo({ id }: { id: ComponentId }) {
           <PillButton variant="primary" label="PRIMARY" />
           <PillButton variant="secondary" label="SECONDARY" />
           <PillButton variant="ghost" label="GHOST" />
+        </Demo>
+      )
+    case 'shadcn-button':
+      return (
+        <Demo
+          title="shadcn Button"
+          description="Built on shadcn/ui pattern (cva + Tailwind utilities). Variants follow theme tokens automatically — switch themes above to compare."
+        >
+          <Button variant="primary" size="md">PRIMARY</Button>
+          <Button variant="secondary" size="md">SECONDARY</Button>
+          <Button variant="ghost" size="md">GHOST</Button>
+          <Button variant="destructive" size="md">DESTRUCTIVE</Button>
+          <Button variant="primary" size="sm">SMALL</Button>
+          <Button variant="primary" size="lg">LARGE</Button>
+        </Demo>
+      )
+    case 'shadcn-slider':
+      return (
+        <Demo
+          title="shadcn Slider"
+          description="Radix UI primitive styled with theme tokens. Replaces native input[range] — better cross-browser thumb + keyboard support."
+        >
+          <div style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>BRIGHTNESS</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700 }}>{sliderVal}%</span>
+            </div>
+            <Slider
+              value={[sliderVal]}
+              onValueChange={([v]) => setSliderVal(v)}
+              min={0}
+              max={100}
+              step={1}
+            />
+          </div>
         </Demo>
       )
     case 'scenes':
@@ -434,7 +564,7 @@ function LibraryDemo({ id }: { id: ComponentId }) {
 // ─── Settings page ────────────────────────────────────────────────────────────
 
 export default function Settings() {
-  const { themeId, setTheme } = useTheme()
+  const { themeId, setTheme, overrideCount, clearAllVars } = useTheme()
   const [selectedComponent, setSelectedComponent] = useState<ComponentId>('buttons')
 
   return (
@@ -472,6 +602,45 @@ export default function Settings() {
           {THEME_LIST.map(t => (
             <ThemeCard key={t.id} theme={t} active={themeId === t.id} onPick={() => setTheme(t.id)} />
           ))}
+        </div>
+      </section>
+
+      {/* Color customization */}
+      <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <SectionLabel>CUSTOMIZE</SectionLabel>
+          {overrideCount > 0 && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={clearAllVars}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '4px 10px', borderRadius: 'var(--radius-pill)',
+                background: 'transparent',
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700,
+                letterSpacing: '0.1em', cursor: 'pointer',
+              }}
+            >
+              <RotateCcw size={12} strokeWidth={2} />
+              RESET ALL
+            </motion.button>
+          )}
+        </div>
+        <div style={{
+          fontFamily: 'var(--font-sans)', fontSize: 12,
+          color: 'var(--text-secondary)', lineHeight: 1.5,
+        }}>
+          Override individual colors of the active theme. Changes persist per theme — switching to another theme leaves these untouched.
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <ColorRow varKey="--accent"       label="ACCENT"       description="Live signals, alerts, halos" />
+          <ColorRow varKey="--text-primary" label="TEXT PRIMARY" description="Headings, body, primary buttons" />
+          <ColorRow varKey="--bg"           label="BACKGROUND"   description="App canvas behind cards" />
+          <ColorRow varKey="--bg-card"      label="CARD"         description="Surface for floating tiles" />
+          <ColorRow varKey="--accent-alt"   label="ACCENT ALT"   description="Secondary signals, OK states" />
         </div>
       </section>
 

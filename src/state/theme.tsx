@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
 
 export type ThemeId = 'nothing' | 'modern' | 'y2k'
 
@@ -31,6 +31,8 @@ export interface ThemeVars {
   '--duration-slow': string
   '--duration-fast': string
 }
+
+export type ThemeVarKey = keyof ThemeVars
 
 export interface Theme {
   id: ThemeId
@@ -153,14 +155,39 @@ export const THEME_LIST: Theme[] = [NOTHING, MODERN, Y2K]
 // ─── Provider ────────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = 'home-os.theme'
+const OVERRIDES_KEY = 'home-os.theme-overrides'
+
+export type ThemeOverrides = Partial<Record<ThemeId, Partial<ThemeVars>>>
 
 interface ThemeContextValue {
   theme: Theme
   themeId: ThemeId
   setTheme: (id: ThemeId) => void
+  /** Resolved value for a var (override beats base). */
+  getVar: (key: ThemeVarKey) => string
+  /** Set an override for the active theme. */
+  setVar: (key: ThemeVarKey, value: string) => void
+  /** Clear a single override (revert to base). */
+  clearVar: (key: ThemeVarKey) => void
+  /** Clear all overrides for the active theme. */
+  clearAllVars: () => void
+  /** Whether the current value differs from the base theme. */
+  isOverridden: (key: ThemeVarKey) => boolean
+  /** Number of overrides currently active for the active theme. */
+  overrideCount: number
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
+
+function loadOverrides(): ThemeOverrides {
+  if (typeof window === 'undefined') return {}
+  try {
+    const raw = localStorage.getItem(OVERRIDES_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [themeId, setThemeId] = useState<ThemeId>(() => {
@@ -169,32 +196,82 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return saved && saved in THEMES ? saved : 'nothing'
   })
 
-  const theme = THEMES[themeId]
+  const [overrides, setOverrides] = useState<ThemeOverrides>(() => loadOverrides())
+
+  const baseTheme = THEMES[themeId]
+  const activeOverrides = overrides[themeId] ?? {}
+  // Resolved vars = base + overrides
+  const resolvedVars: ThemeVars = { ...baseTheme.vars, ...activeOverrides } as ThemeVars
 
   // Apply CSS variables to :root + body class + persist
   useEffect(() => {
     const root = document.documentElement
-    for (const [k, v] of Object.entries(theme.vars)) {
-      root.style.setProperty(k, v)
+    for (const [k, v] of Object.entries(resolvedVars)) {
+      root.style.setProperty(k, v as string)
     }
 
-    // Shell background — gradient or color
-    const shellBg = theme.shellBackground ?? theme.vars['--bg']
+    // Shell background — gradient or color (overrides --bg too if user customized it)
+    const shellBg = baseTheme.shellBackground ?? resolvedVars['--bg']
     document.body.style.background = shellBg
     document.documentElement.style.background = shellBg
 
     // Theme-specific decorative class
     document.body.classList.remove('theme-nothing', 'theme-modern', 'theme-y2k')
-    document.body.classList.add(`theme-${theme.id}`)
-    if (theme.bodyClass && theme.bodyClass !== `theme-${theme.id}`) {
-      document.body.classList.add(theme.bodyClass)
+    document.body.classList.add(`theme-${baseTheme.id}`)
+    if (baseTheme.bodyClass && baseTheme.bodyClass !== `theme-${baseTheme.id}`) {
+      document.body.classList.add(baseTheme.bodyClass)
     }
 
-    localStorage.setItem(STORAGE_KEY, theme.id)
-  }, [theme])
+    localStorage.setItem(STORAGE_KEY, baseTheme.id)
+    localStorage.setItem(OVERRIDES_KEY, JSON.stringify(overrides))
+  }, [resolvedVars, baseTheme, overrides])
+
+  const getVar = useCallback(
+    (key: ThemeVarKey) => (activeOverrides[key] ?? baseTheme.vars[key]) as string,
+    [activeOverrides, baseTheme]
+  )
+
+  const setVar = useCallback((key: ThemeVarKey, value: string) => {
+    setOverrides(prev => ({
+      ...prev,
+      [themeId]: { ...prev[themeId], [key]: value },
+    }))
+  }, [themeId])
+
+  const clearVar = useCallback((key: ThemeVarKey) => {
+    setOverrides(prev => {
+      const next = { ...prev }
+      const themeOverrides = { ...(next[themeId] ?? {}) }
+      delete themeOverrides[key]
+      if (Object.keys(themeOverrides).length === 0) {
+        delete next[themeId]
+      } else {
+        next[themeId] = themeOverrides
+      }
+      return next
+    })
+  }, [themeId])
+
+  const clearAllVars = useCallback(() => {
+    setOverrides(prev => {
+      const next = { ...prev }
+      delete next[themeId]
+      return next
+    })
+  }, [themeId])
+
+  const isOverridden = useCallback(
+    (key: ThemeVarKey) => key in activeOverrides,
+    [activeOverrides]
+  )
+
+  const overrideCount = Object.keys(activeOverrides).length
 
   return (
-    <ThemeContext.Provider value={{ theme, themeId, setTheme: setThemeId }}>
+    <ThemeContext.Provider value={{
+      theme: baseTheme, themeId, setTheme: setThemeId,
+      getVar, setVar, clearVar, clearAllVars, isOverridden, overrideCount,
+    }}>
       {children}
     </ThemeContext.Provider>
   )

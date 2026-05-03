@@ -104,15 +104,28 @@ function MetricCard({ label, sublabel, value, unit, trend, trendColor = '#888', 
 
 // ─── Device catalogue ─────────────────────────────────────────────────────────
 
-const DEVICE_TYPES = [
-  { id: 'co2',   icon: '💨', label: 'CO₂',        sublabel: 'ppm',  unit: 'ppm', baseValue: 412, trend: 'up'     as const },
-  { id: 'uv',    icon: '☀️', label: 'UV INDEX',    sublabel: 'idx',  unit: 'idx', baseValue: 3,   trend: 'stable' as const },
-  { id: 'noise', icon: '🔊', label: 'NOISE',       sublabel: 'dB',   unit: 'dB',  baseValue: 38,  trend: 'up'     as const },
-  { id: 'lux',   icon: '💡', label: 'LUMINANCE',   sublabel: 'lux',  unit: 'lx',  baseValue: 320, trend: 'down'   as const },
-  { id: 'power', icon: '⚡', label: 'POWER',       sublabel: 'W',    unit: 'W',   baseValue: 142, trend: 'up'     as const },
-  { id: 'wind',  icon: '🌬', label: 'WIND',        sublabel: 'km/h', unit: 'km/h',baseValue: 12,  trend: 'stable' as const },
-  { id: 'rain',  icon: '🌧', label: 'RAINFALL',    sublabel: 'mm',   unit: 'mm',  baseValue: 0,   trend: 'stable' as const },
-  { id: 'voc',   icon: '🧪', label: 'VOC',         sublabel: 'µg/m³',unit: 'µg',  baseValue: 58,  trend: 'down'   as const },
+import { Wind, Sun, Volume2, Lightbulb, Zap, CloudRain, FlaskConical } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+
+interface DeviceType {
+  id: string
+  icon: LucideIcon
+  label: string
+  sublabel: string
+  unit: string
+  baseValue: number
+  trend: 'up' | 'stable' | 'down'
+}
+
+const DEVICE_TYPES: DeviceType[] = [
+  { id: 'co2',   icon: Wind,         label: 'CO₂',       sublabel: 'ppm',  unit: 'ppm', baseValue: 412, trend: 'up' },
+  { id: 'uv',    icon: Sun,          label: 'UV INDEX',  sublabel: 'idx',  unit: 'idx', baseValue: 3,   trend: 'stable' },
+  { id: 'noise', icon: Volume2,      label: 'NOISE',     sublabel: 'dB',   unit: 'dB',  baseValue: 38,  trend: 'up' },
+  { id: 'lux',   icon: Lightbulb,    label: 'LUMINANCE', sublabel: 'lux',  unit: 'lx',  baseValue: 320, trend: 'down' },
+  { id: 'power', icon: Zap,          label: 'POWER',     sublabel: 'W',    unit: 'W',   baseValue: 142, trend: 'up' },
+  { id: 'wind',  icon: Wind,         label: 'WIND',      sublabel: 'km/h', unit: 'km/h',baseValue: 12,  trend: 'stable' },
+  { id: 'rain',  icon: CloudRain,    label: 'RAINFALL',  sublabel: 'mm',   unit: 'mm',  baseValue: 0,   trend: 'stable' },
+  { id: 'voc',   icon: FlaskConical, label: 'VOC',       sublabel: 'µg/m³',unit: 'µg',  baseValue: 58,  trend: 'down' },
 ]
 
 // ─── Add device bottom sheet ──────────────────────────────────────────────────
@@ -180,7 +193,8 @@ function AddDeviceSheet({ onClose, onAdd, existing }: AddDeviceSheetProps) {
                     textAlign: 'left',
                   }}
                 >
-                  <span style={{ fontSize: 22 }}>{device.icon}</span>
+                  <device.icon size={22} strokeWidth={1.75} color="var(--text-primary)" />
+
                   <div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.08em' }}>
                       {device.label}
