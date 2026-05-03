@@ -1,66 +1,14 @@
 import { motion } from 'framer-motion'
+import { Home, LayoutGrid, Lightbulb, Zap, Settings } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const tabs = [
-  { id: 'home',      label: 'HOME',   icon: HomeIcon },
-  { id: 'dashboard', label: 'DASH',   icon: GridIcon },
-  { id: 'lighting',  label: 'LIGHT',  icon: BulbIcon },
-  { id: 'energy',    label: 'ENERGY', icon: BoltIcon },
-  { id: 'settings',  label: 'SET',    icon: GearIcon },
+const tabs: { id: string; label: string; icon: LucideIcon }[] = [
+  { id: 'home',      label: 'HOME',   icon: Home },
+  { id: 'dashboard', label: 'DASH',   icon: LayoutGrid },
+  { id: 'lighting',  label: 'LIGHT',  icon: Lightbulb },
+  { id: 'energy',    label: 'ENERGY', icon: Zap },
+  { id: 'settings',  label: 'SET',    icon: Settings },
 ]
-
-function GearIcon({ active }: { active: boolean }) {
-  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <circle cx="10" cy="10" r="3" stroke={c} strokeWidth="1.5" />
-      <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4"
-        stroke={c} strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function HomeIcon({ active }: { active: boolean }) {
-  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M3 9 L10 3 L17 9 V17 H12 V12 H8 V17 H3 Z"
-        stroke={c} strokeWidth="1.5" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function GridIcon({ active }: { active: boolean }) {
-  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <rect x="2" y="2" width="7" height="7" stroke={c} strokeWidth="1.5" />
-      <rect x="11" y="2" width="7" height="7" stroke={c} strokeWidth="1.5" />
-      <rect x="2" y="11" width="7" height="7" stroke={c} strokeWidth="1.5" />
-      <rect x="11" y="11" width="7" height="7" stroke={c} strokeWidth="1.5" />
-    </svg>
-  )
-}
-
-function BulbIcon({ active }: { active: boolean }) {
-  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M10 3C7.24 3 5 5.24 5 8C5 9.98 6.1 11.7 7.75 12.6V15H12.25V12.6C13.9 11.7 15 9.98 15 8C15 5.24 12.76 3 10 3Z"
-        stroke={c} strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M7.75 17H12.25" stroke={c} strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function BoltIcon({ active }: { active: boolean }) {
-  const c = active ? 'var(--text-primary)' : 'var(--text-muted)'
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M11 2L4 11H10L9 18L16 9H10L11 2Z"
-        stroke={c} strokeWidth="1.5" strokeLinejoin="round" />
-    </svg>
-  )
-}
 
 interface BottomNavProps {
   active: string
@@ -97,6 +45,8 @@ export default function BottomNav({ active, onChange, variant = 'bottom' }: Bott
     <nav style={containerStyle}>
       {tabs.map((tab) => {
         const isActive = active === tab.id
+        const Icon = tab.icon
+        const iconColor = isActive ? 'var(--text-primary)' : 'var(--text-muted)'
         return (
           <motion.button
             key={tab.id}
@@ -114,7 +64,7 @@ export default function BottomNav({ active, onChange, variant = 'bottom' }: Bott
               width: isRail ? '100%' : undefined,
             }}
           >
-            <tab.icon active={isActive} />
+            <Icon size={20} strokeWidth={1.75} color={iconColor} />
             <span style={{
               fontFamily: 'var(--font-mono)',
               fontSize: 10,

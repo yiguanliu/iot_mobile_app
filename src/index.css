@@ -1,3 +1,8 @@
+/* Tailwind utilities only — preflight is disabled in tailwind.config.ts so
+   we keep our own reset below and our own font-family rules. shadcn-style
+   components in src/components/ui/ rely on these utility classes. */
+@tailwind utilities;
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
